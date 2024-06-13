@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>衛星科技</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-image: url('https://cdn.mos.cms.futurecdn.net/nMrAbwA67JM3PAjVRQu8yH-1200-80.jpg.webp'); /* 背景圖片的路徑 */
+            background-size: cover;
+            background-position: center; 
+            color: white; 
+        }
+        h1 {
+            font-size: 5em;
+            margin-top: 20px;
+        }
+        .button-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .button {
+            padding: 20px 40px;
+            font-size: 2em;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+        .team {
+            margin-top: auto;
+            padding-bottom: 20px;
+        }
+        .team-member {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .team-member img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>衛星科技</h1>
+    <div class="button-container">
+        <button class="button" onclick="navigateToArduinoPage()">開始</button>
+    </div>
+    <div class="team">
+        <div class="team-member">
+            <img src="賀茂騏.jpg" alt="組員1">
+            <h3>賀茂騏</h3>
+            <p>工作內容</p>
+        </div>
+        <div class="team-member">
+            <img src="member2.jpg" alt="組員2">
+            <h3>戴子頡</h3>
+            <p>工作內容</p>
+        </div>
+        <div class="team-member">
+            <img src="member3.jpg" alt="組員3">
+            <h3>張獻之</h3>
+            <p>工作內容</p>
+        </div>
+        <div class="team-member">
+            <img src="member4.jpg" alt="組員4">
+            <h3>卓裕博</h3>
+            <p>工作內容</p>
+        </div>
+        <div class="team-member">
+            <img src="member5.jpg" alt="組員5">
+            <h3>葉柏毅</h3>
+            <p>工作內容</p>
+        </div>
+    </div>
+    <script>
+        function navigateToArduinoPage() {
+            window.location.href = 'arduino.html';
+        }
+    </script>
+</body>
+</html>

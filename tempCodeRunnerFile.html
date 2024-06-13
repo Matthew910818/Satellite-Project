@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino 資訊</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://img.freepik.com/free-photo/photorealistic-galaxy-background_23-2151064385.jpg?size=626&ext=jpg&ga=GA1.1.1141335507.1717977600&semt=ais_user');
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+        .data {
+            margin: 20px;
+        }
+        #map {
+            height: 300px; 
+            width: 50%;
+            margin: 20px auto;
+        }
+        .arduino-info {
+            font-size: 1.5em; /* 放大字體 */
+            margin: 10px 0;
+        }
+        .alert {
+            background-color: rgba(255, 0, 0, 0.743); /* 半透明紅色背景 */
+            color: white;
+            padding: 5px 10px; /* 添加內邊距 */
+            border-radius: 5px; /* 圓角 */
+        }
+    </style>
+</head>
+<body>
+    <h1>當前GPS位置</h1>
+    <div id="gps-location" class="data">載入中...</div>
+    <div id="map"></div>
+    <h1>Arduino 模組資訊</h1>
+    <div id="arduino-data" class="data">載入中...</div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // GPS位置
+        function getGPSLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById("gps-location").innerHTML = "此瀏覽器不支援地理定位功能。";
+            }
+        }
+
+        // 顯示位置
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            document.getElementById("gps-location").innerHTML = `緯度: ${latitude} <br> 經度: ${longitude}`;
+            showMap(latitude, longitude);
+        }
+
+        // 地圖
+        function showMap(latitude, longitude) {
+            const map = L.map('map').setView([latitude, longitude], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            L.marker([latitude, longitude]).addTo(map)
+                .bindPopup('嗨 氣象站在這！')
+                .openPopup();
+        }
+
+        function showError(error) {
+            let errorMessage = "";
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = "用戶拒絕了地理位置請求。";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = "無法獲取位置信息。";
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = "獲取位置信息超時。";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    errorMessage = "發生未知錯誤。";
+                    break;
+            }
+            document.getElementById("gps-location").innerHTML = errorMessage;
+        }
+
+        //透過 websocket 連接到 arduino
+        function getArduinoData() {
+            const socket = new WebSocket('ws://172.16.2.214:8888');
+            
+            socket.onopen = function() {
+                console.log("WebSocket 連接成功");
+                socket.send("Requesting Arduino data");
+            };
+
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                const temperature = parseInt(data.temperature);
+                const humidity = parseInt(data.humidity);
+                const pm25 = parseInt(data.pm25);
+
+                let temperatureAlert = "";
+                let humidityAlert = "";
+                let pm25Alert = "";
+
+                if (temperature > 30) {
+                    temperatureAlert = "<span class='alert'>溫度過高！</span>";
+                }
+                if (humidity > 50) {
+                    humidityAlert = "<span class='alert'>濕度過高！</span>";
+                }
+                if (pm25 > 70) {
+                    pm25Alert = "<span class='alert'>PM2.5 過高！</span>";
+                }
+
+                document.getElementById("arduino-data").innerHTML = `
+                    <div class="arduino-info">溫度: ${data.temperature} ${temperatureAlert}</div>
+                    <div class="arduino-info">濕度: ${data.humidity} ${humidityAlert}</div>
+                    <div class="arduino-info">PM2.5: ${data.pm25} ${pm25Alert}</div>
+                `;
+            };
+
+            socket.onerror = function(error) {
+                console.error("WebSocket 發生錯誤: ", error);
+                document.getElementById("arduino-data").innerHTML = "無法獲取 Arduino 資訊。";
+            };
+
+            socket.onclose = function() {
+                console.log("WebSocket 連接關閉");
+            };
+        }
+
+        getGPSLocation();
+        getArduinoData();
+    </script>
+</body>
+</html>
