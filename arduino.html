@@ -95,7 +95,7 @@
 
         //透過 websocket 連接到 arduino
         function getArduinoData() {
-            const socket = new WebSocket('ws://192.168.50.220:8888');
+            const socket = new WebSocket('ws://172.20.10.4:8888');
             
             socket.onopen = function() {
                 console.log("WebSocket 連接成功");
