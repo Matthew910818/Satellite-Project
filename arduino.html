@@ -95,23 +95,23 @@
 
         //透過 websocket 連接到 arduino
         function getArduinoData() {
-            const socket = new WebSocket('ws://172.20.10.4:8888');
-            
+            const socket = new WebSocket('wss://172.20.10.4:8888'); // 確保使用 wss
+        
             socket.onopen = function() {
                 console.log("WebSocket 連接成功");
                 socket.send("Requesting Arduino data");
             };
-
+        
             socket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
                 const temperature = parseInt(data.temperature);
                 const humidity = parseInt(data.humidity);
                 const pm25 = parseInt(data.pm25);
-
+        
                 let temperatureAlert = "";
                 let humidityAlert = "";
                 let pm25Alert = "";
-
+        
                 if (temperature > 20) {
                     temperatureAlert = "<span class='alert'>溫度過高！</span>";
                     socket.send("Temperature high")
@@ -124,19 +124,19 @@
                     pm25Alert = "<span class='alert'>PM2.5 過高！</span>";
                     socket.send("PM2.5 high")
                 }
-
+        
                 document.getElementById("arduino-data").innerHTML = `
                     <div class="arduino-info">溫度: ${data.temperature} ${temperatureAlert}</div>
                     <div class="arduino-info">濕度: ${data.humidity} ${humidityAlert}</div>
                     <div class="arduino-info">PM2.5: ${data.pm25} ${pm25Alert}</div>
                 `;
             };
-
+        
             socket.onerror = function(error) {
                 console.error("WebSocket 發生錯誤: ", error);
                 document.getElementById("arduino-data").innerHTML = "無法獲取 Arduino 資訊。";
             };
-
+        
             socket.onclose = function() {
                 console.log("WebSocket 連接關閉");
             };
