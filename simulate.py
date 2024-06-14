@@ -1,24 +1,30 @@
 import requests
 import time
 
-# 模擬數據
-data_template = {
-    'temperature': '11',
-    'humidity': '61',
-    'pm25': '31'
-}
+# 初始值设定
+i = 0
 
-# Flask應用程序的地址
-url = 'http://192.168.105.226:5000/data'
+# Flask应用程序的地址
+url = 'http://192.168.108.142:5000/data'
 
-# 不停地發送POST請求
+# 不停地发送POST请求
 while True:
-    # 發送POST請求
-    response = requests.post(url, data=data_template)
+    # 模拟数据
+    data = {
+        'temperature': str(i),
+        'humidity': str(i),
+        'pm25': str(i)
+    }
     
-    # 打印請求的結果
+    # 发送POST请求
+    response = requests.post(url, data=data)
+    
+    # 打印请求的结果
     print(f"Status Code: {response.status_code}")
     print(f"Response Text: {response.text}")
     
-    # 等待1秒再發送下一個請求
+
+    i += 1
+    
+    # 等待1秒再发送下一个请求
     time.sleep(1)
