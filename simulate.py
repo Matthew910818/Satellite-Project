@@ -3,9 +3,9 @@ import time
 
 # 模擬數據
 data_template = {
-    'temperature': '10',
-    'humidity': '60',
-    'pm25': '35'
+    'temperature': '11',
+    'humidity': '61',
+    'pm25': '31'
 }
 
 # Flask應用程序的地址
