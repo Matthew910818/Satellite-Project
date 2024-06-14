@@ -94,52 +94,53 @@
         }
 
         // 透過 Fetch API 從 GitHub API 獲取 Arduino 資料
-        function getArduinoDataFromGitHub() {
+        async function getArduinoDataFromGitHub() {
+            const token = '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';
+            const headers = {
+                "Authorization": `token ${token}`
+            };
             const timestamp = new Date().getTime();
-            fetch(`https://api.github.com/repos/Matthew910818/Satellite-Project/contents/data.json?timestamp=${timestamp}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // GitHub API 回應的內容中包含了資料的 base64 編碼，需要解碼後才能使用
-                    const content = atob(data.content);
-                    const parsedData = JSON.parse(content);
+            try {
+                const response = await fetch(`https://api.github.com/repos/Matthew910818/Satellite-Project/contents/data.json?timestamp=${timestamp}`, { headers });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                // GitHub API 回應的內容中包含了資料的 base64 編碼，需要解碼後才能使用
+                const content = atob(data.content);
+                const parsedData = JSON.parse(content);
 
-                    const temperature = parseInt(parsedData.temperature);
-                    const humidity = parseInt(parsedData.humidity);
-                    const pm25 = parseInt(parsedData.pm25);
+                const temperature = parseInt(parsedData.temperature);
+                const humidity = parseInt(parsedData.humidity);
+                const pm25 = parseInt(parsedData.pm25);
 
-                    let temperatureAlert = "";
-                    let humidityAlert = "";
-                    let pm25Alert = "";
+                let temperatureAlert = "";
+                let humidityAlert = "";
+                let pm25Alert = "";
 
-                    if (temperature > 20) {
-                        temperatureAlert = "<span class='alert'>溫度過高！</span>";
-                    }
-                    if (humidity > 50) {
-                        humidityAlert = "<span class='alert'>濕度過高！</span>";
-                    }
-                    if (pm25 > 70) {
-                        pm25Alert = "<span class='alert'>PM2.5 過高！</span>";
-                    }
+                if (temperature > 20) {
+                    temperatureAlert = "<span class='alert'>溫度過高！</span>";
+                }
+                if (humidity > 50) {
+                    humidityAlert = "<span class='alert'>濕度過高！</span>";
+                }
+                if (pm25 > 70) {
+                    pm25Alert = "<span class='alert'>PM2.5 過高！</span>";
+                }
 
-                    document.getElementById("arduino-data").innerHTML = `
-                        <div class="arduino-info">溫度: ${parsedData.temperature} ${temperatureAlert}</div>
-                        <div class="arduino-info">濕度: ${parsedData.humidity} ${humidityAlert}</div>
-                        <div class="arduino-info">PM2.5: ${parsedData.pm25} ${pm25Alert}</div>
-                    `;
-                })
-                .catch(error => {
-                    console.error('Fetch error:', error);
-                    document.getElementById("arduino-data").innerHTML = "無法獲取 Arduino 資訊。";
-                });
+                document.getElementById("arduino-data").innerHTML = `
+                    <div class="arduino-info">溫度: ${parsedData.temperature} ${temperatureAlert}</div>
+                    <div class="arduino-info">濕度: ${parsedData.humidity} ${humidityAlert}</div>
+                    <div class="arduino-info">PM2.5: ${parsedData.pm25} ${pm25Alert}</div>
+                `;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                document.getElementById("arduino-data").innerHTML = "無法獲取 Arduino 資訊。";
+            }
         }
 
-        // 定時器間隔，以毫秒為單位（這裡設置為每 5 秒更新一次）
-        const updateInterval = 5000;
+        // 定時器間隔，以毫秒為單位（這裡設置為每 1 分鐘更新一次）
+        const updateInterval = 1000;
 
         // 定義更新函數，用於定期更新 GPS 位置和 Arduino 資料
         function updateData() {
