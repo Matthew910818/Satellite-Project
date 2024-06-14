@@ -95,7 +95,7 @@
 
         //透過 websocket 連接到 arduino
         function getArduinoData() {
-            const socket = new WebSocket('wss://172.20.10.4:8888'); // 確保使用 wss
+            const socket = new WebSocket('wss://192.168.105.226:8888'); // 確保使用 wss
         
             socket.onopen = function() {
                 console.log("WebSocket 連接成功");
@@ -104,6 +104,7 @@
         
             socket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
+                console.log(data)
                 const temperature = parseInt(data.temperature);
                 const humidity = parseInt(data.humidity);
                 const pm25 = parseInt(data.pm25);
