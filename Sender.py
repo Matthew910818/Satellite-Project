@@ -6,7 +6,7 @@ import base64
 app = Flask(__name__)
 
 GITHUB_REPO = "Matthew910818/Satellite-Project"
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = "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"
 FILE_PATH = "data.json"
 
 @app.route('/data', methods=['POST'])
