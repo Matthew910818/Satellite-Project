@@ -20,19 +20,19 @@
             margin: 20px;
         }
         #map {
-            height: 300px; 
+            height: 300px;
             width: 50%;
             margin: 20px auto;
         }
         .arduino-info {
-            font-size: 1.5em; /* 放大字體 */
+            font-size: 1.5em;
             margin: 10px 0;
         }
         .alert {
-            background-color: rgba(255, 0, 0, 0.743); /* 半透明紅色背景 */
+            background-color: rgba(255, 0, 0, 0.743);
             color: white;
-            padding: 5px 10px; /* 添加內邊距 */
-            border-radius: 5px; /* 圓角 */
+            padding: 5px 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -95,9 +95,9 @@
 
         // 透過 Fetch API 從 GitHub API 獲取 Arduino 資料
         async function getArduinoDataFromGitHub() {
-            const token = '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';
+            const token = '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'; // Replace with your GitHub token
             const headers = {
-                "Authorization": `token ${token}`
+                "Authorization": `Bearer ${token}`
             };
             const timestamp = new Date().getTime();
             try {
@@ -140,7 +140,7 @@
         }
 
         // 定時器間隔，以毫秒為單位（這裡設置為每 1 分鐘更新一次）
-        const updateInterval = 1000;
+        const updateInterval = 20000;
 
         // 定義更新函數，用於定期更新 GPS 位置和 Arduino 資料
         function updateData() {
