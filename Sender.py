@@ -6,7 +6,7 @@ import base64
 app = Flask(__name__)
 
 GITHUB_REPO = "Matthew910818/Satellite-Project"
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = "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"
 FILE_PATH = "data.json"
 
 @app.route('/data', methods=['POST'])
@@ -60,4 +60,4 @@ def upload_to_github(data):
         print("Failed to upload file", response.status_code, response.text)
 
 if __name__ == '__main__':
-   app.run(host='192.168.108.142', port=5000)
+   app.run(host='172.20.10.4', port=5000)
