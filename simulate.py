@@ -1,25 +1,20 @@
-import requests
-import time
+# simulate.py
+import asyncio
+import websockets
+import json
+import random
 
-i = 0
+async def send_data():
+    uri = "ws://localhost:8765"
+    async with websockets.connect(uri) as websocket:
+        while True:
+            data = {
+                "temperature": round(random.uniform(31, 33), 1),
+                "humidity": round(random.uniform(75, 79), 1),
+                "pm25": round(random.uniform(10, 50), 1)
+            }
+            await websocket.send(json.dumps(data))
+            await asyncio.sleep(5)  # 每5秒發送一次數據
 
-# Flask地址
-url = 'http://172.20.10.4:5000/data'
-
-# 發出POST請求
-while True:
-    data = {
-        'temperature': str(i),
-        'humidity': str(i),
-        'pm25': str(i)
-    }
-    
-    response = requests.post(url, data=data)
-    
-    print(f"Status Code: {response.status_code}")
-    print(f"Response Text: {response.text}")
-    
-
-    i += 1
-    
-    time.sleep(1)
+if __name__ == "__main__":
+    asyncio.run(send_data())
