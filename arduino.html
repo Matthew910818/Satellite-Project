@@ -20,19 +20,19 @@
             margin: 20px;
         }
         #map {
-            height: 300px;
+            height: 300px; 
             width: 50%;
             margin: 20px auto;
         }
         .arduino-info {
-            font-size: 1.5em;
+            font-size: 1.5em; /* 放大字體 */
             margin: 10px 0;
         }
         .alert {
-            background-color: rgba(255, 0, 0, 0.743);
+            background-color: rgba(255, 0, 0, 0.743); /* 半透明紅色背景 */
             color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
+            padding: 5px 10px; /* 添加內邊距 */
+            border-radius: 5px; /* 圓角 */
         }
     </style>
 </head>
@@ -93,54 +93,46 @@
             document.getElementById("gps-location").innerHTML = errorMessage;
         }
 
-        // 透過 Fetch API 從 GitHub API 獲取 Arduino 資料
-        async function getArduinoDataFromGitHub() {
-            const token = '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'; // Replace with your GitHub token
-            const headers = {
-                "Authorization": `Bearer ${token}`
-            };
-            const timestamp = new Date().getTime();
-            try {
-                const response = await fetch(`https://api.github.com/repos/Matthew910818/Satellite-Project/contents/data.json?timestamp=${timestamp}`, { headers });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                // GitHub API 回應的內容中包含了資料的 base64 編碼，需要解碼後才能使用
-                const content = atob(data.content);
-                const parsedData = JSON.parse(content);
+        // 通過 WebSocket 獲取 Arduino 資料
+        function getArduinoDataFromWebSocket() {
+            const socket = new WebSocket('ws://localhost:8765');
 
-                const temperature = parseInt(parsedData.temperature);
-                const humidity = parseInt(parsedData.humidity);
-                const pm25 = parseInt(parsedData.pm25);
+            socket.onmessage = function(event) {
+                const parsedData = JSON.parse(event.data);
+
+                const temperature = parseFloat(parsedData.temperature).toFixed(1);
+                const humidity = parseFloat(parsedData.humidity).toFixed(1);
+                const pm25 = parseFloat(parsedData.pm25).toFixed(1);
 
                 let temperatureAlert = "";
                 let humidityAlert = "";
                 let pm25Alert = "";
 
-                if (temperature > 20) {
+                if (temperature > 25) {
                     temperatureAlert = "<span class='alert'>溫度過高！</span>";
                 }
                 if (humidity > 50) {
                     humidityAlert = "<span class='alert'>濕度過高！</span>";
                 }
-                if (pm25 > 70) {
+                if (pm25 > 30) {
                     pm25Alert = "<span class='alert'>PM2.5 過高！</span>";
                 }
 
                 document.getElementById("arduino-data").innerHTML = `
-                    <div class="arduino-info">溫度: ${parsedData.temperature} ${temperatureAlert}</div>
-                    <div class="arduino-info">濕度: ${parsedData.humidity} ${humidityAlert}</div>
-                    <div class="arduino-info">PM2.5: ${parsedData.pm25} ${pm25Alert}</div>
+                    <div class="arduino-info">溫度: ${temperature} ${temperatureAlert}</div>
+                    <div class="arduino-info">濕度: ${humidity} ${humidityAlert}</div>
+                    <div class="arduino-info">PM2.5: ${pm25} ${pm25Alert}</div>
                 `;
-            } catch (error) {
-                console.error('Fetch error:', error);
+            };
+
+            socket.onerror = function(error) {
+                console.error('WebSocket Error:', error);
                 document.getElementById("arduino-data").innerHTML = "無法獲取 Arduino 資訊。";
-            }
+            };
         }
 
         // 定時器間隔，以毫秒為單位（這裡設置為每 1 分鐘更新一次）
-        const updateInterval = 20000;
+        const updateInterval = 60000;
 
         // 定義更新函數，用於定期更新 GPS 位置和 Arduino 資料
         function updateData() {
@@ -148,7 +140,7 @@
             getGPSLocation();
 
             // 更新 Arduino 資料
-            getArduinoDataFromGitHub();
+            getArduinoDataFromWebSocket();
         }
 
         // 啟動定時器，定期調用更新函數
